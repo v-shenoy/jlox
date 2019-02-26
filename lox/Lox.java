@@ -57,6 +57,10 @@ public class Lox
         {
             System.out.println(token);
         }
+        Parser p = new Parser(tokens);
+        Expr expr = p.parse();
+        Printer a = new Printer();
+        System.out.println(a.print(expr));
     }
 
     static void error(int line, int col, String message)
@@ -68,5 +72,17 @@ public class Lox
     {
         System.err.println("[line " + line +", col " + col + "] Error" + where + ":" + message);
         hadError = true;
+    }
+
+    static void error(Token token, String message)
+    {
+        if(token.type == TokenType.END)
+        {
+            report(token.line, token.col, " at end", message);
+        }
+        else
+        {
+            report(token.line, token.col, " at ''" + token.lexeme + "''", message);
+        }
     }
 }
