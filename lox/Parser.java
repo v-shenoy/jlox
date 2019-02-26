@@ -1,6 +1,7 @@
 package lox;
 
 import java.util.List;
+import java.util.ArrayList;
 
 class Parser
 {
@@ -14,11 +15,16 @@ class Parser
         this.tokens = tokens;
     }
 
-    Expr parse()
+    List<Stmt> parse()
     {
         try
         {
-            return expression();
+            List<Stmt> statements = new ArrayList<>();
+            while(!atEnd()) 
+            {                      
+                statements.add(declaration());
+            }
+            return statements;
         }
         catch(ParseError error)
         {
@@ -26,9 +32,94 @@ class Parser
         }
     }
 
+    private Stmt declaration()
+    {
+        try
+        {
+            if(match(TokenType.LET))
+            {
+                return varDeclaration();
+            }
+            return statement();
+        }
+        catch(ParseError error)
+        {
+            sync();
+            return null;
+        }
+    }
+
+    private Stmt varDeclaration()
+    {
+        Token name = consume(TokenType.ID, "Expect variable name");
+        Expr initializer = null;
+        if(match(TokenType.ASSIGN))
+        {
+            initializer = expression(); 
+        }
+        consume(TokenType.SEMI_COLON, "Expect ';' after variable declaration.");
+        return new Stmt.Let(name, initializer); 
+    }
+
+    private Stmt statement()
+    {
+        if(match(TokenType.PRINT))
+        {
+            return printStmt();
+        }
+        if(match(TokenType.LBRACE))
+        {
+            return new Stmt.Block(block());
+        }
+        return expressionStmt();
+    }
+
+    private List<Stmt> block()
+    {
+        List<Stmt> statements = new ArrayList<>();
+        while (!check(TokenType.RBRACE) && !atEnd()) 
+        {     
+            statements.add(declaration());                
+        }                                               
+        consume(TokenType.RBRACE, "Expect '}' after block.");
+        return statements;
+    }
+
+    private Stmt printStmt()
+    {
+        Expr val = expression();
+        consume(TokenType.SEMI_COLON, "Expect ';' at end of print statement.");
+        return new Stmt.Print(val);
+    }
+
+    private Stmt expressionStmt()
+    {
+        Expr val = expression();
+        consume(TokenType.SEMI_COLON, "Expect ';' at end of expression.");
+        return new Stmt.Expression(val);
+    }
+
     private Expr expression()
     {
-        return equality();
+        return assignment();
+    }
+
+    private Expr assignment()
+    {
+        
+        Expr expr = equality();
+        if(match(TokenType.ASSIGN))
+        {
+            Token equals = previous();
+            Expr value = assignment();
+            if(expr instanceof Expr.Variable)
+            {
+                Token name = ((Expr.Variable)expr).name;
+                return new Expr.Assign(name, value);
+            }
+            error(equals, "Invalid assignment target.");
+        }
+        return expr;
     }
 
     private Expr equality()
@@ -139,6 +230,10 @@ class Parser
             consume(TokenType.RPAREN, "Unmatched ')'");
             expr = new Expr.Grouping(grp);
         }
+        else if(match(TokenType.ID))
+        {
+            return new Expr.Variable(previous());
+        }
         if(expr != null)
         {
             return expr;
@@ -170,21 +265,21 @@ class Parser
             {
                 return;
             }
+            switch(peek().type)
+            {
+                // Enums don't need to be qualified in switch cases apparently
+                case CLASS:
+                case DEFINE:
+                case LET:
+                case FOR:
+                case WHILE:
+                case DO:
+                case IF:  
+                case PRINT:
+                    return;
+            }   
+            advance();
         }
-        switch(peek().type)
-        {
-            // Enums don't need to be qualified in switch cases apparently
-            case CLASS:
-            case DEFINE:
-            case LET:
-            case FOR:
-            case WHILE:
-            case DO:
-            case IF:  
-            case PRINT:
-                return;
-        }   
-        advance();
     }
 
     private boolean match(TokenType... types)

@@ -1,17 +1,73 @@
 package lox;
 
-class Interpreter implements Expr.Visitor<Object>
+import java.util.List;   
+
+class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>
 {
-    public void interpret(Expr expr)
+    private Environment environment = new Environment();
+
+    public void interpret(List<Stmt> stmts)
     {
         try
         {
-            Object val = evaluate(expr);
-            System.out.println(stringify(val));
+            for(Stmt stmt : stmts)
+            {
+                execute(stmt);
+            }
         }
         catch(RuntimeError error)
         {
             Lox.runtimeError(error);
+        }
+    }
+
+    @Override
+    public Void visitExprStmt(Stmt.Expression stmt)
+    {
+        evaluate(stmt.expr);
+        return null;
+    }
+
+    @Override
+    public Void visitPrintStmt(Stmt.Print stmt)
+    {
+        Object val = evaluate(stmt.expr);
+        System.out.println(stringify(val));
+        return null;
+    }
+
+    @Override                                     
+    public Void visitLetStmt(Stmt.Let stmt) 
+    {     
+        Object value = null;                        
+        if (stmt.initializer != null) {             
+            value = evaluate(stmt.initializer);       
+        }
+        environment.define(stmt.name, stmt.name.lexeme, value);
+        return null;                                
+    }
+    
+    @Override                                                     
+    public Void visitBlockStmt(Stmt.Block stmt) 
+    {                 
+        executeBlock(stmt.statements, new Environment(environment));
+        return null;                                                
+    }
+
+    private void executeBlock(List<Stmt> stmts, Environment env)
+    {
+        Environment previous = this.environment;
+        try
+        {
+            this.environment = env;
+            for(Stmt stmt : stmts)
+            {
+                execute(stmt);
+            }
+        }
+        finally
+        {
+            this.environment = previous;
         }
     }
 
@@ -131,9 +187,28 @@ class Interpreter implements Expr.Visitor<Object>
         return evaluate(expr.expression);
     }
 
+    @Override                                            
+    public Object visitVarExpr(Expr.Variable expr) 
+    {
+        return environment.get(expr.name);                 
+    }
+
     private Object evaluate(Expr expr)
     {
         return  expr.accept(this);
+    }
+
+    @Override                                        
+    public Object visitAssignExpr(Expr.Assign expr) 
+    {
+        Object value = evaluate(expr.value);
+        environment.assign(expr.name, value);          
+        return value;                                  
+    }
+
+    private void execute(Stmt stmt) 
+    {
+        stmt.accept(this);             
     }
 
     private boolean isTruthy(Object object)

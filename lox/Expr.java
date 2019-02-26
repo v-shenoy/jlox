@@ -13,6 +13,8 @@ abstract class Expr
         T visitUnary(Unary expr);
         T visitLiteral(Literal expr);
         T visitGrouping(Grouping expr); 
+        T visitVarExpr(Variable expr);
+        T visitAssignExpr(Assign expr);
     }
    
     static class Binary extends Expr
@@ -73,5 +75,38 @@ abstract class Expr
             return vis.visitGrouping(this);
         }
     }
+    
+    static class Variable extends Expr 
+    {
+        final Token name;
+    
+        Variable(Token name) 
+        {
+            this.name = name;
+        }
+
+        @Override
+        <T> T accept(Visitor<T> vis)
+        {
+            return vis.visitVarExpr(this);
+        }
+    }
+
+    static class Assign extends Expr 
+    {       
+        final Token name;                      
+        final Expr value;
+
+        Assign(Token name, Expr value) 
+        {       
+            this.name = name;                    
+            this.value = value;                  
+        }
+
+        <T> T accept(Visitor<T> visitor) 
+        {     
+            return visitor.visitAssignExpr(this);
+        }                                                            
+    }  
 }
  

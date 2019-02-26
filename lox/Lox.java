@@ -65,12 +65,18 @@ public class Lox
         tokenizer.scanTokens();
         List<Token> tokens = tokenizer.getTokens();
 
-        if(!hadError)
+        if(hadError)
         {
-            Parser parser = new Parser(tokens);
-            Expr expr = parser.parse();
-            interpreter.interpret(expr);
+            return;
         }
+
+        Parser parser = new Parser(tokens);
+        List<Stmt> statements = parser.parse();
+        if(hadError)
+        {
+            return;
+        }
+        interpreter.interpret(statements);
     }
 
     static void error(int line, int col, String message)
@@ -92,7 +98,7 @@ public class Lox
         }
         else
         {
-            report(token.line, token.col, " at ''" + token.lexeme + "''", message);
+            report(token.line, token.col, " at '" + token.lexeme + "'", message);
         }
     }
 
