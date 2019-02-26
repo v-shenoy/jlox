@@ -53,14 +53,17 @@ public class Lox
         tokenizer.scanTokens();
         List<Token> tokens = tokenizer.getTokens();
 
-        for(Token token : tokens)
+        if(!hadError)
         {
-            System.out.println(token);
+            for(Token token : tokens)
+            {
+                System.out.println(token);
+            }
+            Parser p = new Parser(tokens);
+            Expr expr = p.parse();
+            Printer a = new Printer();
+            System.out.println(a.print(expr));
         }
-        Parser p = new Parser(tokens);
-        Expr expr = p.parse();
-        Printer a = new Printer();
-        System.out.println(a.print(expr));
     }
 
     static void error(int line, int col, String message)

@@ -86,7 +86,14 @@ class Tokenizer
                 addToken(TokenType.MINUS);
                 break;
             case '/':
-                addToken(TokenType.DIV);
+                if(match('*'))
+                {
+                    handleMultiComments();
+                }
+                else
+                {
+                    addToken(TokenType.DIV);
+                }
                 break;
             case '%':
                 addToken(TokenType.MOD);
@@ -183,6 +190,38 @@ class Tokenizer
                 {
                     Lox.error(line, col, "Unknown symbol");
                 }
+        }
+    }
+
+    private void handleMultiComments()
+    {
+        while(true)
+        {
+            if(atEnd())
+            {
+                Lox.error(line, col, "unterminated  comment"); 
+                return;              
+            }
+            if(peek() == '/')
+            {
+                consume();
+                if(match('*'))
+                {
+                    handleMultiComments();
+                }
+            }
+            else if(peek() == '*')
+            {
+                consume();
+                if(match('/'))
+                {
+                    return;
+                }
+            }
+            if(!atEnd())
+            {
+                consume();
+            }
         }
     }
 
