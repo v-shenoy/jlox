@@ -11,6 +11,8 @@ import java.util.List;
 public class Lox
 {
     static boolean hadError = false;
+    static boolean hadRuntimeError = false;
+    private static final Interpreter interpreter = new Interpreter();
 
     public static void main(String args[]) throws IOException
     {
@@ -33,6 +35,14 @@ public class Lox
     {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
         run(new String(bytes, Charset.defaultCharset()));
+        if(hadError)
+        {
+            System.exit(65);
+        }
+        if(hadRuntimeError)
+        {
+            System.exit(70);    
+        }
     }
 
     private static void runPrompt() throws IOException
@@ -42,8 +52,10 @@ public class Lox
 
         while(true)
         {
-            System.out.print("lox>");
+            System.out.print("lox> ");
             run(br.readLine());
+            hadError = false;
+            hadRuntimeError = false;
         }
     }
 
@@ -55,14 +67,9 @@ public class Lox
 
         if(!hadError)
         {
-            for(Token token : tokens)
-            {
-                System.out.println(token);
-            }
-            Parser p = new Parser(tokens);
-            Expr expr = p.parse();
-            Printer a = new Printer();
-            System.out.println(a.print(expr));
+            Parser parser = new Parser(tokens);
+            Expr expr = parser.parse();
+            interpreter.interpret(expr);
         }
     }
 
@@ -87,5 +94,11 @@ public class Lox
         {
             report(token.line, token.col, " at ''" + token.lexeme + "''", message);
         }
+    }
+
+    public static void runtimeError(RuntimeError error) 
+    {
+        System.err.println(error.getMessage() + ": [line " + error.token.line + " col " + error.token.col + "]");   
+        hadRuntimeError = true;                     
     }
 }
