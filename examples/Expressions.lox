@@ -1,0 +1,129 @@
+/*
+    Expressions is a combination of tokens that produce a value.
+    Think : arithmetic mostly
+*/
+
+/* Arithmetic Expressions. They work like you would expect them to (almost, the precedence of unary -,
+** is messed up. Too lazy to fix it.) */
+
+/* The operator precedence in this implmentation of Lox is as follows 
+(Highest ones at the top) - 
+
+1.  ~, not, -
+2.  **
+3.  %
+4.  *, /
+5.  +, -
+6.  >, >=, <, <=
+7.  =, !=
+8.  &
+9.  ^
+10  . | 
+11. and
+12. or
+13. := 
+*/
+
+let a := 10;
+let b := 3;
+
+print "Value of a: " + a;
+print "Value of b: " + b;
+
+print "----";
+print "";
+
+print "Value of a + b:" + (a + b);
+print "Value of a - b:" + (a - b);
+print "Value of a * b:" + a * b;
+print "Value of a / b:" + a/b;
+print "Value of a % b:" + a%b;
+print "Value of a ** b:" + a**b;
+print "Value of -a: " + -a;
+print "Value of b after assignment: " + (b := 4); /* Assignment is also an expression which 
+                                             evaluates to the value being assigned */
+
+print "----"; # Escape sequences aren't supported. Did I tell you I was lazy?
+print "";
+
+# Boolean Expressions
+
+print "Value of a > b: " + (a > b);
+print "Value of a >= b: " + (a >= b);
+print "Value of a < b: " + (a < b);
+print "Value of a <= b: " + (a <= b);
+print "Value of a = b: " + (a = b);
+print "Value of a != b: " + (a != b);
+
+print "----";
+print "";
+
+# Bitwise operations. Only supported if the operands are integers.
+
+let c := 2.5;
+# print a & c; Will produce an error.
+
+print "Value of a & b: " + (a & b);
+print "Value of a | b: " + (a | b);
+print "Value of a ^ b: " + (a ^ b);
+print "Value of ~a: " + ~a;
+
+print "----";
+print "";
+
+# String operations 
+
+let name := "Vighnesh" + "!";
+let greeting := "Hello";
+
+print greeting + ", " + name; 
+print "Converted to string : " + 5;
+
+/* 
+    If you hadn't noticed so far, + supports string concatenation.
+    Even if one of the operands is a number. The only implicit conversion
+    done in the language 
+*/
+
+# Strings can be checked for equality the same way as numbers.
+
+let str1 := "Test1";
+let str2 := "Test2";
+let str3 := "Test1";
+
+print "Value of str1 = str2: " + (str1 = str2);
+print "Value of str1 = str3: " + (str1 = str3);
+print "----";
+print "";
+
+/*
+    Logical operators work the same way they do in most languages.
+    Lox uses the full keyword like Python.
+*/
+
+/*
+    Note :- 
+    In Lox, 0 evaluate to true. This might seem weird, but the only thing that 
+    evaluate to false when used in a logical expression are 'false', and 'nil'.
+*/
+
+a := true;
+b := 0;
+
+# Both evaluate to false
+print "Value of not a: " + not a; 
+print "Value of not b: " + not b; 
+
+/*
+    and, or are shortcircuited.
+    If the first expression is true, the second won't be evaluated (in case of or).
+    The same goes for and if the first expression is false.
+*/
+
+print "Value of true and true: " + (true and true);
+print "Value of true or false: " + (true or false);
+print "Value of false and true: " + (false and true);
+print "Value of nil and true: " + (nil and true);
+
+print "----";
+print "Mess around a bit and try different expressions for yourself ;).";

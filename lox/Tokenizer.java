@@ -218,6 +218,11 @@ class Tokenizer
                     return;
                 }
             }
+            else if(peek() == '\n')
+            {
+                line++;
+                col = 0;
+            }
             if(!atEnd())
             {
                 consume();

@@ -1,0 +1,7 @@
+# This is a single line comment.
+/* Multi-line comments used a C-style syntax.
+   The implentation even allows them to be nested.
+   /* This is allowed. */
+*/
+
+print "Hello, World!"; # It wouldn't be an introduction if we printed anything else, would it?

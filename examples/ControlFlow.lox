@@ -1,0 +1,57 @@
+/*  
+    Conditionals, Loop constructs are identical to C.
+    Except the for loop, where the variable cannot be declared in the loop initializer.
+
+    Ternary operator hasn't been added yet.
+*/
+
+let a := 2;
+if(a > 2)
+{
+    print "Greater than 2";
+}
+else if(a < 2)
+{
+    print "Less than 2";
+}
+else
+{
+    print "Equal to 2";
+}
+
+/*
+    The else statement binds to the closest if.
+*/
+
+print "---";
+print "While";
+print "";
+let i:= 0;
+
+while(i< 10)
+{
+    print i;
+    i := i + 1;
+}
+
+print "---";
+print "For";
+print "";
+
+let fact := 1;
+for(i:=1;i<=10;i:=i+1)
+{
+    fact := fact*i;
+    print "Factorial of " + i + " is: " + fact;
+}
+
+print "---";
+print "Do-while";
+print "";
+
+let x := 1;
+do
+{
+    print x;
+    x := x + 1;
+} while(x<1);

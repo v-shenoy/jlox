@@ -1,0 +1,37 @@
+/* Variables are declared using the 'let' keyword.
+   By default, unitialized variables are given the value 'nil' (think nullptr, null, or None from other
+   languages)
+
+   The assignment operator is not the same as C-style languages. 
+   This implementation uses ':=' for assignment. Kapiche?
+
+   Variables can be declared only once. Undeclared variables cannot be used.
+*/
+
+# All statements need to be terminated with semi-colons. 
+
+print 6;
+
+let a;
+print a; # Will print 'nil'
+
+# let a; Will give an error if uncommented. Cannot be declared again.
+
+let b := 5;
+print "Value of b is: " + b;
+
+# print c; This is illegal, try to execute after uncommenting.
+
+# Lox uses static block scope like most languages. 
+
+let x := 10;
+{
+    let x := 5;
+    print "Inside block: " + x; # Prints 5
+}
+print "After block: " + x; # Prints 10
+
+/*
+    Note : Lox is dynamically typed, and has only three data types.
+    Double precision floating point numbers, Strings, and nil.
+*/
