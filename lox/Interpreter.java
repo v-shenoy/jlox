@@ -72,6 +72,28 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>
     }
 
     @Override
+    public Object visitLogicalExpr(Expr.Logical expr)
+    {
+        Object left = evaluate(expr.left);
+        if(expr.op.type == TokenType.OR)
+        {
+            if(isTruthy(left))
+            {
+               return true; 
+            }
+            return isTruthy(evaluate(expr.right));
+        }
+        else
+        {
+            if(!isTruthy(left))
+            {
+                return false;
+            }
+            return isTruthy(evaluate(expr.right));
+        }
+    }
+
+    @Override
     public Object visitBinary(Expr.Binary expr)
     {
         Object left = evaluate(expr.left);
@@ -156,10 +178,6 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>
                 return isEqual(left, right);
             case NOT_EQUALS:
                 return !isEqual(left, right);
-            case OR:
-                return isTruthy(left) || isTruthy(right);
-            case AND:
-                return isTruthy(left) && isTruthy(right);
             case BIT_AND:
                 if(isInteger(left) && isInteger(right))
                 {

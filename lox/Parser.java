@@ -129,7 +129,7 @@ class Parser
         {
             Token op = previous();
             Expr right = logicalAnd();
-            left = new Expr.Binary(left, op, right);
+            left = new Expr.Logical(left, op, right);
         }
         return left;
     }
@@ -141,7 +141,7 @@ class Parser
         {
             Token op = previous();
             Expr right = bitwiseOr();
-            left = new Expr.Binary(left, op, right);
+            left = new Expr.Logical(left, op, right);
         }
         return left;
     }

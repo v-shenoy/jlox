@@ -15,6 +15,7 @@ abstract class Expr
         T visitGrouping(Grouping expr); 
         T visitVarExpr(Variable expr);
         T visitAssignExpr(Assign expr);
+        T visitLogicalExpr(Logical expr);
     }
    
     static class Binary extends Expr
@@ -107,6 +108,24 @@ abstract class Expr
         {     
             return visitor.visitAssignExpr(this);
         }                                                            
-    }  
+    } 
+
+    static class Logical extends Expr
+    {
+        final Token op;
+        final Expr left, right;
+
+        Logical(Expr left, Token op, Expr right) 
+        {       
+            this.left = left;
+            this.op = op;    
+            this.right = right;                
+        }
+
+        <T> T accept(Visitor<T> visitor) 
+        {     
+            return visitor.visitLogicalExpr(this);
+        } 
+    }
 }
  

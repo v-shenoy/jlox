@@ -88,6 +88,12 @@ class Printer implements Expr.Visitor<String>, Stmt.Visitor<String>
         return builder.toString();
     }
 
+    @Override
+    public String visitLogicalExpr(Expr.Logical expr)
+    {
+        return parenthesize(expr.op.lexeme, expr.left, expr.right);        
+    }
+
     private String parenthesize(String name, Expr... exprs)
     {
         StringBuilder builder = new StringBuilder();
@@ -134,7 +140,7 @@ class Printer implements Expr.Visitor<String>, Stmt.Visitor<String>
 
     public static void main(String args[])
     {
-        String source = "print a ^ b;";
+        String source = "print a and b;";
         Tokenizer tokenizer = new Tokenizer(source);
         tokenizer.scanTokens();
         List<Token> tokens = tokenizer.getTokens();
