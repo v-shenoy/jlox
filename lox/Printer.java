@@ -1,10 +1,17 @@
 package lox;
 
+import java.util.List;
+
 class Printer implements Expr.Visitor<String>, Stmt.Visitor<String>
 {
     String print(Expr expr)
     {
         return expr.accept(this);
+    }
+
+    String print(Stmt stmt) 
+    {
+        return stmt.accept(this);
     }
 
     @Override
@@ -123,5 +130,21 @@ class Printer implements Expr.Visitor<String>, Stmt.Visitor<String>
         }
         builder.append(")");
         return builder.toString();
+    }
+
+    public static void main(String args[])
+    {
+        String source = "print a ^ b;";
+        Tokenizer tokenizer = new Tokenizer(source);
+        tokenizer.scanTokens();
+        List<Token> tokens = tokenizer.getTokens();
+
+        Parser parser = new Parser(tokens);
+        List<Stmt> statements = parser.parse();
+        Printer p = new Printer();
+        for(Stmt stmt : statements)
+        {
+            System.out.println(p.print(stmt));
+        }
     }
 }

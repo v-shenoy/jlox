@@ -23,7 +23,7 @@ class Environment
     {
         if(values.containsKey(name))
         {
-            throw new RuntimeError(varToken, "Variable '" + name + "' already exists.");
+            throw new RuntimeError(varToken, "Variable '" + name + "' already exists");
         }
         values.put(name, value);
     }
@@ -40,7 +40,7 @@ class Environment
             enclosing.assign(name, value); 
             return;                        
         }
-        throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
+        throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'");
     }
 
     Object get(Token name)

@@ -156,6 +156,37 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>
                 return isEqual(left, right);
             case NOT_EQUALS:
                 return !isEqual(left, right);
+            case OR:
+                return isTruthy(left) || isTruthy(right);
+            case AND:
+                return isTruthy(left) && isTruthy(right);
+            case BIT_AND:
+                if(isInteger(left) && isInteger(right))
+                {
+                    Double l = (Double)left;
+                    Double r = (Double)right;
+                    int result = l.intValue() & r.intValue();
+                    return (double)result;
+                }
+                throw new RuntimeError(expr.op, "Operand must be integers");
+            case BIT_XOR:
+                if(isInteger(left) && isInteger(right))
+                {
+                    Double l = (Double)left;
+                    Double r = (Double)right;
+                    int result = l.intValue() ^ r.intValue();
+                    return (double)result;
+                }
+                throw new RuntimeError(expr.op, "Operand must be integers");
+            case BIT_OR:
+                if(isInteger(left) && isInteger(right))
+                {
+                    Double l = (Double)left;
+                    Double r = (Double)right;
+                    int result = l.intValue() | r.intValue();
+                    return (double)result;
+                }
+                throw new RuntimeError(expr.op, "Operand must be integers");
         }
         return null;
     }
@@ -171,6 +202,13 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>
                 return -(double)right;
             case NOT:
                 return !isTruthy(right);
+            case BIT_NOT:
+                if(isInteger(right))
+                {
+                    Double val = (Double)right;
+                    return (double)(~val.intValue());
+                }
+            throw new RuntimeError(expr.op, "Operand must be an integer");
         }
         return null;
     }
@@ -240,6 +278,16 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>
             return;
         }
         throw new RuntimeError(op, "Operand must be a number");
+    }
+
+    private boolean isInteger(Object object)
+    {
+        if(object instanceof Double)
+        {
+            double val = (double)object;
+            return !Double.isInfinite(val) && (Math.floor(val) == val);
+        }
+        return false;
     }
 
     private void checkNumbers(Token op, Object a, Object b)

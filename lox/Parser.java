@@ -107,7 +107,7 @@ class Parser
     private Expr assignment()
     {
         
-        Expr expr = equality();
+        Expr expr = logicalOr();
         if(match(TokenType.ASSIGN))
         {
             Token equals = previous();
@@ -120,6 +120,66 @@ class Parser
             error(equals, "Invalid assignment target.");
         }
         return expr;
+    }
+
+    private Expr logicalOr()
+    {
+        Expr left = logicalAnd();
+        while(match(TokenType.OR))
+        {
+            Token op = previous();
+            Expr right = logicalAnd();
+            left = new Expr.Binary(left, op, right);
+        }
+        return left;
+    }
+
+    private Expr logicalAnd()
+    {
+        Expr left = bitwiseOr();
+        while(match(TokenType.AND))
+        {
+            Token op = previous();
+            Expr right = bitwiseOr();
+            left = new Expr.Binary(left, op, right);
+        }
+        return left;
+    }
+
+    private Expr bitwiseOr()
+    {
+        Expr left = bitwiseXor();
+        while(match(TokenType.BIT_OR))
+        {
+            Token op = previous();
+            Expr right = bitwiseOr();
+            left = new Expr.Binary(left, op, right);
+        }
+        return left;
+    }
+
+    private Expr bitwiseXor()
+    {
+        Expr left = bitwiseAnd();
+        while(match(TokenType.BIT_XOR))
+        {
+            Token op = previous();
+            Expr right = bitwiseAnd();
+            left = new Expr.Binary(left, op, right);
+        }
+        return left;
+    }
+
+    private Expr bitwiseAnd()
+    {
+        Expr left = equality();
+        while(match(TokenType.BIT_AND))
+        {
+            Token op = previous();
+            Expr right = equality();
+            left = new Expr.Binary(left, op, right);
+        }
+        return left;
     }
 
     private Expr equality()
@@ -196,7 +256,7 @@ class Parser
 
     private Expr unary()
     {
-        if(match(TokenType.BIT_NOT, TokenType.MINUS))
+        if(match(TokenType.BIT_NOT, TokenType.NOT, TokenType.MINUS))
         {
             Token op = previous();
             Expr right = unary();
