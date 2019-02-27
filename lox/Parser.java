@@ -71,7 +71,83 @@ class Parser
         {
             return new Stmt.Block(block());
         }
+        if(match(TokenType.IF))
+        {
+            return ifStatement();
+        }
+        if(match(TokenType.WHILE))
+        {
+            return whileStatement();
+        }
+        if(match(TokenType.DO))
+        {
+            return doWhileStmt();
+        }
+        if(match(TokenType.FOR))
+        {
+            return forStmt();
+        }
         return expressionStmt();
+    }
+
+    private Stmt forStmt()
+    {
+        consume(TokenType.LPAREN, "Expect '(' after for.");
+        Expr init = null;
+        if(!match(TokenType.SEMI_COLON))
+        {
+            init = expression();
+            consume(TokenType.SEMI_COLON, "Expect ';' after initializer.");
+        }
+        Expr cond = null;
+        if(!match(TokenType.SEMI_COLON))
+        {
+            cond = expression();
+            consume(TokenType.SEMI_COLON, "Expect ';' after condition.");
+        }
+        Expr incr = null;
+        if(!match(TokenType.RPAREN))
+        {
+            incr = expression();
+            consume(TokenType.RPAREN, "Expect ')' after for expression.");
+        }
+        Stmt body = statement();
+        return new Stmt.For(init, cond, incr, body);
+    }
+
+    private Stmt doWhileStmt()
+    {
+        Stmt body = statement();
+        consume(TokenType.WHILE, "Expect 'while' after do block.");
+        consume(TokenType.LPAREN, "Expect '(' after while.");
+        Expr cond = expression();
+        consume(TokenType.RPAREN, "Expect ')' after while condition.");
+        consume(TokenType.SEMI_COLON, "Expect ';' after do-while.");
+        return new Stmt.DoWhile(cond, body);
+    }
+
+    private Stmt whileStatement()
+    {
+        consume(TokenType.LPAREN, "Expect '(' after while.");
+        Expr cond = expression();
+        consume(TokenType.RPAREN, "Expect ')' after while condition.");
+        Stmt body = statement();
+        return new Stmt.While(cond, body);
+    }
+
+    private Stmt ifStatement()
+    {
+        consume(TokenType.LPAREN, "Expect '(' after if.");
+        Expr cond = expression();
+        consume(TokenType.RPAREN, "Expect ')' after if condition.");
+
+        Stmt thenBranch = statement();
+        Stmt elseBranch = null;
+        if(match(TokenType.ELSE))
+        {
+            elseBranch = statement();
+        }
+        return new Stmt.If(cond, thenBranch, elseBranch);
     }
 
     private List<Stmt> block()

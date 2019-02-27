@@ -12,6 +12,10 @@ abstract class Stmt
         T visitExprStmt(Expression stmt);
         T visitLetStmt(Let stmt);
         T visitBlockStmt(Block stmt);
+        T visitIfStmt(If stmt);
+        T visitWhileStmt(While stmt);
+        T visitDoWhileStmt(DoWhile stmt);
+        T visitForStmt(For stmt);
     }
 
     static class Expression extends Stmt
@@ -76,6 +80,78 @@ abstract class Stmt
         <T> T accept(Visitor<T> vis) 
         {
             return vis.visitBlockStmt(this);
+        }
+    }
+
+    static class If extends Stmt
+    {
+        final Expr cond;
+        final Stmt thenBranch;
+        final Stmt elseBranch;
+
+        If(Expr cond, Stmt thenBranch, Stmt elseBranch)
+        {
+            this.cond = cond;
+            this.thenBranch = thenBranch;
+            this.elseBranch = elseBranch;
+        }
+
+        <T> T accept(Visitor<T> vis)
+        {
+            return vis.visitIfStmt(this);
+        }
+    }
+
+    static class While extends Stmt
+    {
+        final Expr cond;
+        final Stmt body;
+
+        While(Expr cond, Stmt body)
+        {
+            this.cond = cond;
+            this.body = body;
+        }
+
+        <T> T accept(Visitor<T> vis)
+        {
+            return vis.visitWhileStmt(this);
+        }
+    }
+
+    static class DoWhile extends Stmt
+    {
+        final Expr cond;
+        final Stmt body;
+
+        DoWhile(Expr cond, Stmt body)
+        {
+            this.cond = cond;
+            this.body = body;
+        }
+
+        <T> T accept(Visitor<T> vis)
+        {
+            return vis.visitDoWhileStmt(this);
+        }
+    }
+
+    static class For extends Stmt
+    {
+        final Expr init, cond, incr;
+        final Stmt body;
+
+        For(Expr init, Expr cond, Expr incr, Stmt body)
+        {
+            this.init = init;
+            this.cond = cond;
+            this.incr = incr;
+            this.body = body;
+        }
+
+        <T> T accept(Visitor<T> vis)
+        {
+            return vis.visitForStmt(this);
         }
     }
 }

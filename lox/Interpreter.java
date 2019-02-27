@@ -72,6 +72,65 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>
     }
 
     @Override
+    public Void visitIfStmt(Stmt.If stmt)
+    {
+        if(isTruthy(evaluate(stmt.cond)))
+        {
+            execute(stmt.thenBranch);
+        }
+        else if(stmt.elseBranch != null)
+        {
+            execute(stmt.elseBranch);
+        }
+        return null;
+    }
+
+    @Override
+    public Void visitWhileStmt(Stmt.While stmt)
+    {
+        while(isTruthy(evaluate(stmt.cond)))
+        {
+            execute(stmt.body);
+        }
+        return null;
+    }
+
+    @Override
+    public Void visitDoWhileStmt(Stmt.DoWhile stmt)
+    {
+        do
+        {
+            execute(stmt.body);
+        } while(isTruthy(evaluate(stmt.cond)));
+        return null;
+    }
+
+    @Override
+    public Void visitForStmt(Stmt.For stmt)
+    {
+        if(stmt.init != null)
+        {
+            evaluate(stmt.init);
+        }
+        while(true)
+        {
+            if(stmt.cond != null)
+            {
+                if(!isTruthy(evaluate(stmt.cond)))
+                {
+                    break;
+                }
+            }
+            execute(stmt.body);
+            if(stmt.incr != null)
+            {
+                evaluate(stmt.incr);
+            }
+        }
+        return null;
+    }
+
+    @Override
     public Object visitLogicalExpr(Expr.Logical expr)
     {
         Object left = evaluate(expr.left);

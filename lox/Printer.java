@@ -81,11 +81,40 @@ class Printer implements Expr.Visitor<String>, Stmt.Visitor<String>
     {
         StringBuilder builder = new StringBuilder();
         builder.append("(block ");
-        for (Stmt statement : stmt.statements) {
-        builder.append(statement.accept(this));
+        for (Stmt statement : stmt.statements) 
+        {
+            builder.append(statement.accept(this));
         }
         builder.append(")");
         return builder.toString();
+    }
+
+    @Override
+    public String visitIfStmt(Stmt.If stmt)
+    {
+        if(stmt.elseBranch == null)
+        {
+            return parenthesize2("if", stmt.cond, stmt.thenBranch);
+        }
+        return parenthesize2("if-else", stmt.cond, stmt.elseBranch, stmt.thenBranch);
+    }
+
+    @Override
+    public String visitWhileStmt(Stmt.While stmt)
+    {
+        return parenthesize2("while", stmt.cond, stmt.body);
+    }
+
+    @Override
+    public String visitDoWhileStmt(Stmt.DoWhile stmt)
+    {
+        return parenthesize2("do-while",  stmt.body, stmt.cond);
+    }
+
+    @Override
+    public String visitForStmt(Stmt.For stmt)
+    {
+        return parenthesize2("for", stmt.init, stmt.cond, stmt.incr, stmt.body);
     }
 
     @Override
@@ -140,7 +169,7 @@ class Printer implements Expr.Visitor<String>, Stmt.Visitor<String>
 
     public static void main(String args[])
     {
-        String source = "print a and b;";
+        String source = "for(;;){print i;}";
         Tokenizer tokenizer = new Tokenizer(source);
         tokenizer.scanTokens();
         List<Token> tokens = tokenizer.getTokens();
