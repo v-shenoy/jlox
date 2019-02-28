@@ -3,7 +3,7 @@ package lox;
 enum TokenType
 {
     // Grouping
-    LPAREN, RPAREN, SEMI_COLON, LBRACE, RBRACE,
+    LPAREN, RPAREN, SEMI_COLON, LBRACE, RBRACE, COMMA, 
     // Arithmetic
     PLUS, MINUS, MUL, DIV, ASSIGN, MOD, EXP,
 
@@ -23,7 +23,7 @@ enum TokenType
     // Reserved words
     IF, ELSE, LET, DEFINE, FOR, WHILE, DO, RETURN, 
     TRUE, FALSE, NIL, BREAK, CONTINUE, PRINT, CLASS,
-    SUPER, SELF,
+    SUPER, SELF, QUESTION, COLON,
 
     // Others
     END

@@ -55,6 +55,12 @@ class Printer implements Expr.Visitor<String>, Stmt.Visitor<String>
     }
 
     @Override
+    public String visitConditionalExpr(Expr.Conditional expr)
+    {
+        return parenthesize("?:", expr.cond, expr.thenBranch, expr.elseBranch);
+    }
+
+    @Override
     public String visitExprStmt(Stmt.Expression stmt) 
     {
         return parenthesize(";", stmt.expr);

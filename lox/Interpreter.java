@@ -5,6 +5,9 @@ import java.util.List;
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>
 {
     private Environment environment = new Environment();
+    /* Sentinel value to seperate it from null, since
+    null might represent nil. */
+    private static Object unitialized = new Object();
 
     public void interpret(List<Stmt> stmts)
     {
@@ -39,7 +42,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>
     @Override                                     
     public Void visitLetStmt(Stmt.Let stmt) 
     {     
-        Object value = null;                        
+        Object value = unitialized;                        
         if (stmt.initializer != null) {             
             value = evaluate(stmt.initializer);       
         }
@@ -264,6 +267,8 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>
                     return (double)result;
                 }
                 throw new RuntimeError(expr.op, "Operand must be integers");
+            case COMMA:
+                return right;
         }
         return null;
     }
@@ -305,7 +310,12 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>
     @Override                                            
     public Object visitVarExpr(Expr.Variable expr) 
     {
-        return environment.get(expr.name);                 
+        Object value = environment.get(expr.name);     
+        if(value == unitialized)
+        {
+            throw new RuntimeError(expr.name, "Variable must be initialized before use");
+        }            
+        return value;
     }
 
     private Object evaluate(Expr expr)
@@ -319,6 +329,19 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>
         Object value = evaluate(expr.value);
         environment.assign(expr.name, value);          
         return value;                                  
+    }
+
+    @Override
+    public Object visitConditionalExpr(Expr.Conditional expr)
+    {
+        if(isTruthy(evaluate(expr.cond)))
+        {
+           return evaluate(expr.thenBranch);
+        }
+        else
+        {
+            return evaluate(expr.elseBranch);
+        }
     }
 
     private void execute(Stmt stmt) 

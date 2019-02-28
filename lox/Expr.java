@@ -16,6 +16,7 @@ abstract class Expr
         T visitVarExpr(Variable expr);
         T visitAssignExpr(Assign expr);
         T visitLogicalExpr(Logical expr);
+        T visitConditionalExpr(Conditional expr);
     }
    
     static class Binary extends Expr
@@ -125,6 +126,23 @@ abstract class Expr
         <T> T accept(Visitor<T> visitor) 
         {     
             return visitor.visitLogicalExpr(this);
+        } 
+    }
+
+    static class Conditional extends Expr
+    {
+        final Expr cond, thenBranch, elseBranch;
+
+        Conditional(Expr cond, Expr thenBranch, Expr elseBranch)
+        {
+            this.cond = cond;
+            this.thenBranch = thenBranch;
+            this.elseBranch = elseBranch;
+        }
+
+        <T> T accept(Visitor<T> visitor) 
+        {     
+            return visitor.visitConditionalExpr(this);
         } 
     }
 }

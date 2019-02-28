@@ -177,13 +177,25 @@ class Parser
 
     private Expr expression()
     {
-        return assignment();
+        return comma();
+    }
+
+    private Expr comma()
+    {
+        Expr left = assignment();
+        while(match(TokenType.COMMA))
+        {
+            Token op = previous();
+            Expr right = assignment();
+            left = new Expr.Binary(left, op, right);
+        }
+        return left;
     }
 
     private Expr assignment()
     {
         
-        Expr expr = logicalOr();
+        Expr expr = conditional();
         if(match(TokenType.ASSIGN))
         {
             Token equals = previous();
@@ -194,6 +206,19 @@ class Parser
                 return new Expr.Assign(name, value);
             }
             error(equals, "Invalid assignment target.");
+        }
+        return expr;
+    }
+
+    private Expr conditional()
+    {
+        Expr expr = logicalOr();
+        if(match(TokenType.QUESTION))
+        {
+            Expr thenBranch = expression();
+            consume(TokenType.COLON, "Expect ':' after conditional expressio.");
+            Expr elseBranch = conditional();
+            expr = new  Expr.Conditional(expr, thenBranch, elseBranch);
         }
         return expr;
     }

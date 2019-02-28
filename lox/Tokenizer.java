@@ -79,6 +79,9 @@ class Tokenizer
             case '}':
                 addToken(TokenType.RBRACE);
                 break;
+            case ',':
+                addToken(TokenType.COMMA);
+                break;
             case '+':
                 addToken(TokenType.PLUS);
                 break;
@@ -123,6 +126,9 @@ class Tokenizer
                     addToken(TokenType.MUL);
                 }
                 break;
+            case '?':
+                addToken(TokenType.QUESTION);
+                break;
             case ':':
                 if(match('='))
                 {
@@ -130,7 +136,8 @@ class Tokenizer
                 }
                 else
                 {
-                    Lox.error(line, col, "Unexpected char");
+                    // Lox.error(line, col, "Unexpected char");
+                    addToken(TokenType.COLON);
                 }
                 break;
             case '!':
