@@ -40,6 +40,10 @@ class Parser
             {
                 return varDeclaration();
             }
+            if(match(TokenType.DEFINE))
+            {
+                return funDeclaration("function");
+            }
             return statement();
         }
         catch(ParseError error)
@@ -47,6 +51,28 @@ class Parser
             sync();
             return null;
         }
+    }
+
+    private Stmt funDeclaration(String kind)
+    {
+        Token name = consume(TokenType.ID, "Expect " + kind + " name.");
+        consume(TokenType.LPAREN, "Expect '(' after " + kind + " name."); 
+        List<Token> params = new ArrayList<>();
+        if(!check(TokenType.RPAREN))
+        {
+            do
+            {
+                if(params.size() >= 8)
+                {
+                    error(peek(),  "Cannot have more than 8 parameters.");
+                }
+                params.add(consume(TokenType.ID, "Expect parameter name."));
+            } while(match(TokenType.COMMA));
+        }
+        consume(TokenType.RPAREN, "Expect ')' after parameters.");
+        consume(TokenType.LBRACE, "Expect '{' before " + kind + " body.");
+        List<Stmt> body = block();                                  
+        return new Stmt.Function(name, params, body);
     }
 
     private Stmt varDeclaration()
@@ -87,7 +113,23 @@ class Parser
         {
             return forStmt();
         }
+        if(match(TokenType.RETURN))
+        {
+            return returnStmt();
+        }
         return expressionStmt();
+    }
+
+    private Stmt returnStmt()
+    {
+        Token keyword = previous();
+        Expr expr = null;
+        if(!check(TokenType.SEMI_COLON))
+        {
+            expr = expression();
+        }
+        consume(TokenType.SEMI_COLON, "Expect ';' after return statement.");
+        return new Stmt.Return(keyword, expr);
     }
 
     private Stmt forStmt()
@@ -363,7 +405,42 @@ class Parser
             Expr right = unary();
             return new Expr.Unary(op, right);
         }
-        return primary();
+        return call();
+    }
+
+    private Expr call()
+    {
+        Expr callee = primary();
+        while(true)
+        {
+            if(match(TokenType.LPAREN))
+            {
+                callee = finishCall(callee);
+            }
+            else
+            {
+                break;
+            }
+        }
+        return callee;
+    }
+
+    private Expr finishCall(Expr callee)
+    {
+        List<Expr> args = new ArrayList<>();
+        if(!check(TokenType.RPAREN))
+        {
+            do
+            {
+                if(args.size() >= 8)
+                {
+                    error(peek(), "Cannot have more than 8 arguments.");
+                }
+                args.add(expression());
+            } while(match(TokenType.COMMA));
+        }
+        Token paren = consume(TokenType.RPAREN, "Expect ')' after arguments.");
+        return new Expr.Call(callee, paren, args);
     }
 
     private Expr primary()

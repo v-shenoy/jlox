@@ -28,6 +28,11 @@ class Environment
         values.put(name, value);
     }
 
+    void define(String name, Object value)
+    {
+        values.put(name, value);
+    }
+
     void assign(Token name, Object value)
     {
         if(values.containsKey(name.lexeme))

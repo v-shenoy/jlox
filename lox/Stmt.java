@@ -16,6 +16,8 @@ abstract class Stmt
         T visitWhileStmt(While stmt);
         T visitDoWhileStmt(DoWhile stmt);
         T visitForStmt(For stmt);
+        T visitFunctionStmt(Function stmt);
+        T visitReturnStmt(Return stmt);
     }
 
     static class Expression extends Stmt
@@ -152,6 +154,42 @@ abstract class Stmt
         <T> T accept(Visitor<T> vis)
         {
             return vis.visitForStmt(this);
+        }
+    }
+
+    static class Function extends Stmt
+    {
+        Token name;
+        List<Token> params;
+        List<Stmt> body;
+
+        Function(Token name, List<Token> params, List<Stmt> body)
+        {
+            this.name = name;
+            this.params = params;
+            this.body = body;
+        }
+
+        <T> T accept(Visitor<T> vis)
+        {
+            return vis.visitFunctionStmt(this);
+        }
+    }
+
+    static class Return extends Stmt
+    {
+        Expr expr;
+        Token keyword;
+
+        Return(Token keyword, Expr expr)
+        {
+            this.keyword = keyword;
+            this.expr = expr;
+        }
+
+        <T> T accept(Visitor<T> vis)
+        {
+            return vis.visitReturnStmt(this);
         }
     }
 }

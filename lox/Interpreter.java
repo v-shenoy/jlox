@@ -1,13 +1,38 @@
 package lox;
 
 import java.util.List;   
+import java.util.ArrayList;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>
 {
-    private Environment environment = new Environment();
+    public Environment globals = new Environment();
+    private Environment environment = globals;
     /* Sentinel value to seperate it from null, since
     null might represent nil. */
     private static Object unitialized = new Object();
+
+    Interpreter()
+    {
+        globals.define("clock", new LoxCallable(){
+            @Override
+            public int arity()
+            {
+                return 0;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arg)
+            {
+                return (double) System.currentTimeMillis()/1000;
+            }
+
+            @Override
+            public String toString()
+            {
+                return "<native fn>";
+            }
+        });
+    }
 
     public void interpret(List<Stmt> stmts)
     {
@@ -57,7 +82,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>
         return null;                                                
     }
 
-    private void executeBlock(List<Stmt> stmts, Environment env)
+    public void executeBlock(List<Stmt> stmts, Environment env)
     {
         Environment previous = this.environment;
         try
@@ -131,6 +156,25 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>
             }
         }
         return null;
+    }
+
+    @Override
+    public Void visitFunctionStmt(Stmt.Function stmt)
+    {
+        LoxFunction func = new LoxFunction(stmt, environment);
+        environment.define(stmt.name.lexeme, func);
+        return null;
+    }
+
+    @Override
+    public Void visitReturnStmt(Stmt.Return stmt)
+    {
+        Object value = null;
+        if(stmt.expr != null)
+        {
+            value = evaluate(stmt.expr);
+        }        
+        throw new Return(value);
     }
 
     @Override
@@ -316,6 +360,28 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>
             throw new RuntimeError(expr.name, "Variable must be initialized before use");
         }            
         return value;
+    }
+
+    @Override
+    public Object visitCallExpr(Expr.Call expr)
+    {
+        Object callee = evaluate(expr.callee);
+        List<Object> arguments = new ArrayList<>();
+        if(!(callee instanceof LoxCallable))
+        {
+            throw new RuntimeError(expr.paren, "Can only call functions and classes.");
+        }
+        for(Expr arg : expr.args)
+        {
+            arguments.add(evaluate(arg));
+        }
+        LoxCallable function = (LoxCallable)callee;
+        if(arguments.size() != function.arity())
+        {
+            throw new RuntimeError(expr.paren, "Expected " + function.arity() + " arguments but got "
+            + arguments.size() + ".");
+        }
+        return function.call(this, arguments);
     }
 
     private Object evaluate(Expr expr)

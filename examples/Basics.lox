@@ -1,11 +1,10 @@
-/* Variables are declared using the 'let' keyword.
-   By default, unitialized variables are given the value 'nil' (think nullptr, null, or None from other
-   languages)
+/*
+ Variables are declared using the 'let' keyword.
 
    The assignment operator is not the same as C-style languages. 
    This implementation uses ':=' for assignment. Kapiche?
 
-   Variables can be declared only once. Undeclared variables cannot be used.
+   Variables can be declared only once. Undeclared/uninitialized variables cannot be used.
 */
 
 # All statements need to be terminated with semi-colons. 
@@ -13,8 +12,8 @@
 print 6;
 
 let a;
-print a; # Will print 'nil'
-
+# print a; Error
+ 
 # let a; Will give an error if uncommented. Cannot be declared again.
 
 let b := 5;

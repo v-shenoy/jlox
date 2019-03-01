@@ -1,10 +1,9 @@
 package lox;
 
+import java.util.List;
+
 abstract class Expr
 {
-    Expr left, right, expression;
-    Token op;
-    Object val;
     abstract <T> T accept(Visitor<T> vis);
 
     interface Visitor<T>
@@ -17,10 +16,14 @@ abstract class Expr
         T visitAssignExpr(Assign expr);
         T visitLogicalExpr(Logical expr);
         T visitConditionalExpr(Conditional expr);
+        T visitCallExpr(Call expr);
     }
    
     static class Binary extends Expr
     {
+        final Expr left, right;
+        Token op;
+
         Binary(Expr left, Token op, Expr right)
         {
             this.left = left;
@@ -37,6 +40,9 @@ abstract class Expr
 
     static class Unary extends Expr
     {
+        final Expr right;
+        Token op;
+
         Unary(Token op, Expr right)
         {
             this.op = op;
@@ -52,6 +58,8 @@ abstract class Expr
 
     static class Literal extends Expr
     {
+        final Object val;
+
         Literal(Object val)
         {
             this.val = val;
@@ -66,6 +74,8 @@ abstract class Expr
 
     static class Grouping extends Expr
     {
+        final Expr expression;
+
         Grouping(Expr expression)
         {
             this.expression = expression;
@@ -144,6 +154,25 @@ abstract class Expr
         {     
             return visitor.visitConditionalExpr(this);
         } 
+    }
+
+    static class Call extends Expr
+    {
+        final Expr callee;
+        Token paren;
+        final List<Expr> args;
+
+        Call(Expr callee, Token paren, List<Expr> args)
+        {
+            this.callee = callee;
+            this.paren = paren;
+            this.args = args;
+        }
+
+        <T> T accept(Visitor<T> vis)
+        {
+            return vis.visitCallExpr(this);
+        }
     }
 }
  

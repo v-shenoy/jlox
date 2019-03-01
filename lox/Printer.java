@@ -61,6 +61,12 @@ class Printer implements Expr.Visitor<String>, Stmt.Visitor<String>
     }
 
     @Override
+    public String visitCallExpr(Expr.Call expr) 
+    {
+        return parenthesize2("call", expr.callee, expr.args);
+    }
+
+    @Override
     public String visitExprStmt(Stmt.Expression stmt) 
     {
         return parenthesize(";", stmt.expr);
@@ -121,6 +127,39 @@ class Printer implements Expr.Visitor<String>, Stmt.Visitor<String>
     public String visitForStmt(Stmt.For stmt)
     {
         return parenthesize2("for", stmt.init, stmt.cond, stmt.incr, stmt.body);
+    }
+
+    @Override
+    public String visitFunctionStmt(Stmt.Function stmt) 
+    {
+        StringBuilder builder = new StringBuilder();
+        builder.append("(fun " + stmt.name.lexeme + "(");
+
+        for (Token param : stmt.params) 
+        {
+            if (param != stmt.params.get(0)) 
+            {
+                builder.append(" ");
+            }
+            builder.append(param.lexeme);
+        }
+
+
+        builder.append(") ");
+
+        for (Stmt body : stmt.body) 
+        {
+            builder.append(body.accept(this));
+        }   
+
+        builder.append(")");
+        return builder.toString();
+    }
+
+    @Override
+    public String visitReturnStmt(Stmt.Return stmt)
+    {
+        return parenthesize("return", stmt.expr);
     }
 
     @Override

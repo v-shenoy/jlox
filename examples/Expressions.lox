@@ -58,6 +58,25 @@ print "Value of a != b: " + (a != b);
 print "----";
 print "";
 
+# Comma expressions. They evaluate to the last argument. 
+print 1,2; /* Prints 2. This happens because print is baked into the language as a statement rather than a function call.
+            Solution to this would to instead remove the print statement and move it up the precedence order, 
+            and make it a function. */
+
+print 1,2,3,4,5; # Prints 5
+
+print "----";
+print "";
+
+# Conditional 
+# (expr1)?(expr2):(expr3) evaluates to expr2 if expr1 is true, else evaluates to expr3
+
+let x := 5;
+print (x=5)?("x is 5"):("x is not 5");
+
+print "----";
+print "";
+
 # Bitwise operations. Only supported if the operands are integers.
 
 let c := 2.5;
