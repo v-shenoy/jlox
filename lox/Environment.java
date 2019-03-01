@@ -60,4 +60,19 @@ class Environment
         }
         throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
     }
+
+    Object getAt(int distance, Token name)
+    {
+        return ancestor(distance).get(name);
+    }
+
+    private Environment ancestor(int distance)
+    {
+        Environment env = this;
+        for(int i=0;i<distance;i++)
+        {
+            env = env.enclosing;
+        }
+        return env;
+    }
 }

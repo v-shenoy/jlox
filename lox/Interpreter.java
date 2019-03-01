@@ -2,6 +2,8 @@ package lox;
 
 import java.util.List;   
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>
 {
@@ -10,6 +12,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>
     /* Sentinel value to seperate it from null, since
     null might represent nil. */
     private static Object unitialized = new Object();
+    private static Map<Expr, Integer> locals = new HashMap<>();
 
     Interpreter()
     {
@@ -32,6 +35,11 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>
                 return "<native fn>";
             }
         });
+    }
+
+    void resolve(Expr expr, int depth)
+    {
+        locals.put(expr, depth);
     }
 
     public void interpret(List<Stmt> stmts)
@@ -354,12 +362,25 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>
     @Override                                            
     public Object visitVarExpr(Expr.Variable expr) 
     {
-        Object value = environment.get(expr.name);     
+        Object value = lookUpVariables(expr.name, expr);     
         if(value == unitialized)
         {
             throw new RuntimeError(expr.name, "Variable must be initialized before use");
         }            
         return value;
+    }
+
+    private Object lookUpVariables(Token name, Expr expr)
+    {
+        Integer distance = locals.get(expr);
+        if(distance != null)
+        {
+            return environment.getAt(distance, name);
+        }
+        else
+        {
+            return globals.get(name);
+        }
     }
 
     @Override
