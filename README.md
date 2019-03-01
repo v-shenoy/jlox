@@ -3,8 +3,14 @@
 My first foray into understanding how actual interpreters and compilers work, following this excellent
 book, [Crafting Interpreters](http://craftinginterpreters.com/ "Crafting Interpreters") by Bob Nystrom. 
 
-## To Do
-1. Add ternary operator.
-2. Comma seperator.
-3. Disable auto-initialization to nil.
-4. Printing expression values to screen in REPL.
+## Additions 
+Alongside the features supported in Crafting Interpreters, I've added - 
+
+1. Do-while loops
+2. Break, Continue statements
+3. Bitwise operators ( ~, &, ^, | )
+4. Exponeniation operator \*\* 
+5. Modulo operator % 
+6. Ternary operator ?:
+7. Comma operator ,
+8. Nested /**/ comments
