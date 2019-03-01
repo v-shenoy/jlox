@@ -58,6 +58,18 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>
     }
 
     @Override
+    public Void visitBreakStmt(Stmt.Break stmt)
+    {
+        throw new Jump(JumpType.BREAK);
+    }
+
+    @Override
+    public Void visitContinueStmt(Stmt.Continue stmt)
+    {
+        throw new Jump(JumpType.CONTINUE);
+    }
+
+    @Override
     public Void visitExprStmt(Stmt.Expression stmt)
     {
         evaluate(stmt.expr);
@@ -126,7 +138,21 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>
     {
         while(isTruthy(evaluate(stmt.cond)))
         {
-            execute(stmt.body);
+            try
+            {
+                execute(stmt.body);
+            }
+            catch(Jump jump)
+            {
+                if(jump.type == JumpType.BREAK)
+                {
+                    break;
+                }
+                else
+                {
+                    continue;
+                }
+            }
         }
         return null;
     }
@@ -136,7 +162,22 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>
     {
         do
         {
-            execute(stmt.body);
+            try
+            {
+                execute(stmt.body);
+
+            }
+            catch(Jump jump)
+            {
+                if(jump.type == JumpType.BREAK)
+                {
+                    break;
+                }
+                else
+                {
+                    continue;
+                }
+            }
         } while(isTruthy(evaluate(stmt.cond)));
         return null;
     }
@@ -157,7 +198,25 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>
                     break;
                 }
             }
-            execute(stmt.body);
+            try
+            {
+                execute(stmt.body);
+            }  
+            catch(Jump jump)
+            {
+                if(jump.type == JumpType.BREAK)
+                {
+                    break;
+                }
+                else
+                {
+                    if(stmt.incr != null)
+                    {
+                        evaluate(stmt.incr);
+                    }
+                    continue;
+                }
+            } 
             if(stmt.incr != null)
             {
                 evaluate(stmt.incr);

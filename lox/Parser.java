@@ -117,6 +117,18 @@ class Parser
         {
             return returnStmt();
         }
+        if(match(TokenType.BREAK))
+        {
+            Token keyword = previous();
+            consume(TokenType.SEMI_COLON, "Expect ';' after break statement.");
+            return new Stmt.Break(keyword);
+        }
+        if(match(TokenType.CONTINUE))
+        {
+            Token keyword = previous();
+            consume(TokenType.SEMI_COLON, "Expect ';' after continue statement.");
+            return new Stmt.Continue(keyword);
+        }
         return expressionStmt();
     }
 
@@ -436,7 +448,7 @@ class Parser
                 {
                     error(peek(), "Cannot have more than 8 arguments.");
                 }
-                args.add(expression());
+                args.add(assignment());
             } while(match(TokenType.COMMA));
         }
         Token paren = consume(TokenType.RPAREN, "Expect ')' after arguments.");

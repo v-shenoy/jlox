@@ -10,9 +10,31 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>
     private final Interpreter interpreter;
     private final Stack< Map<String, Boolean> > scopes = new Stack<>();
     private FunctionType currentFunction = FunctionType.NONE;
+    private LoopType currentLoopType = LoopType.NONE;
+
     Resolver(Interpreter interpreter)
     {
         this.interpreter = interpreter;
+    }
+
+    @Override
+    public Void visitBreakStmt(Stmt.Break stmt)
+    {
+        if(currentLoopType == LoopType.NONE)
+        {
+            Lox.error(stmt.keyword, "Break can only used be inside loops."); 
+        }
+        return null;
+    }
+
+    @Override
+    public Void visitContinueStmt(Stmt.Continue stmt)
+    {
+        if(currentLoopType == LoopType.NONE)
+        {
+            Lox.error(stmt.keyword, "Continue can only used be inside loops."); 
+        }
+        return null;
     }
 
     @Override
@@ -185,16 +207,22 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>
     @Override
     public Void visitWhileStmt(Stmt.While stmt)
     {
+        LoopType enclosingType = currentLoopType;
+        currentLoopType = LoopType.LOOP;
         resolve(stmt.cond);
         resolve(stmt.body);
+        currentLoopType = enclosingType;
         return null;
     }
 
     @Override
     public Void visitDoWhileStmt(Stmt.DoWhile stmt)
     {
+        LoopType enclosingType = currentLoopType;
+        currentLoopType = LoopType.LOOP;
         resolve(stmt.body);
         resolve(stmt.cond);
+        currentLoopType = enclosingType;
         return null;
     }
 
@@ -213,7 +241,10 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>
         {
             resolve(stmt.incr);
         }
+        LoopType enclosingType = currentLoopType;
+        currentLoopType = LoopType.LOOP;
         resolve(stmt.body);
+        currentLoopType = enclosingType;
         return null;
     }
 

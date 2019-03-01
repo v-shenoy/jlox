@@ -18,6 +18,8 @@ abstract class Stmt
         T visitForStmt(For stmt);
         T visitFunctionStmt(Function stmt);
         T visitReturnStmt(Return stmt);
+        T visitBreakStmt(Break stmt);
+        T visitContinueStmt(Continue stmt);
     }
 
     static class Expression extends Stmt
@@ -190,6 +192,36 @@ abstract class Stmt
         <T> T accept(Visitor<T> vis)
         {
             return vis.visitReturnStmt(this);
+        }
+    }
+
+    static class Break extends Stmt
+    {
+        Token keyword;
+
+        Break(Token keyword)
+        {
+            this.keyword = keyword;
+        }
+
+        <T> T accept(Visitor<T> vis)
+        {
+            return vis.visitBreakStmt(this);
+        }
+    }
+
+    static class Continue extends Stmt
+    {
+        Token keyword;
+
+        Continue(Token keyword)
+        {
+            this.keyword = keyword;
+        }
+
+        <T> T accept(Visitor<T> vis)
+        {
+            return vis.visitContinueStmt(this);
         }
     }
 }
