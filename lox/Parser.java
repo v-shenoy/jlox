@@ -129,7 +129,71 @@ class Parser
             consume(TokenType.SEMI_COLON, "Expect ';' after continue statement.");
             return new Stmt.Continue(keyword);
         }
+        if(match(TokenType.SWITCH))
+        {
+            return switchStmt();
+        }
         return expressionStmt();
+    }
+
+    private Stmt switchStmt()
+    {
+        consume(TokenType.LPAREN, "Expect '(' after switch.");
+        Expr cond = expression();
+        consume(TokenType.RPAREN, "Expect ')' after switch expression.");
+        consume(TokenType.LBRACE, "Expect '{' at the start of switch block.");
+
+       ArrayList<Stmt> branches = new ArrayList<>();
+       ArrayList<Object> exprs = new ArrayList<>();
+
+        while(!match(TokenType.RBRACE))
+        {
+            if(atEnd())
+            {
+                Lox.error(peek(), "Unexpected end of file.");
+            }
+            else if(match(TokenType.CASE))
+            {
+                if(!match(TokenType.STRING, TokenType.NUMBER, TokenType.TRUE, TokenType.FALSE, TokenType.NIL))
+                {
+                    error(peek(), "Case expressions must be constants.");
+                }
+                Object val = previous().literal;
+                if(exprs.indexOf(val) != -1)
+                {
+                    error(peek(), "Case expressions must be unique.");
+                }
+                consume(TokenType.COLON, "Expect ':' after case.");
+                Stmt toDo = null;
+                if(!check(TokenType.CASE) && !check(TokenType.DEFAULT) && !check(TokenType.RBRACE))
+                {
+                    toDo = statement();
+                }
+                exprs.add(val);
+                branches.add(toDo);
+            }
+            else if(match(TokenType.DEFAULT))
+            {
+                if(exprs.indexOf("default") != -1)
+                {
+                    error(peek(), "Duplicate default stmt.");
+                }
+                consume(TokenType.COLON, "Expect ':' after case.");
+                Stmt toDo = null;
+                if(!check(TokenType.CASE) && !check(TokenType.DEFAULT) && !check(TokenType.RBRACE))
+                {
+                    toDo = statement();
+                }
+                exprs.add("default");
+                branches.add(toDo);
+            }
+            else
+            {
+                error(peek(), "Unexpected token in middle of switch block.");
+                break;
+            }
+        }
+        return new Stmt.Switch(cond, exprs, branches);
     }
 
     private Stmt returnStmt()
@@ -526,6 +590,10 @@ class Parser
                 case DO:
                 case IF:  
                 case PRINT:
+                case SWITCH:
+                case BREAK:
+                case CONTINUE:
+                case RETURN:
                     return;
             }   
             advance();

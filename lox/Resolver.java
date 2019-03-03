@@ -22,7 +22,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>
     {
         if(currentLoopType == LoopType.NONE)
         {
-            Lox.error(stmt.keyword, "Break can only used be inside loops."); 
+            Lox.error(stmt.keyword, "Break can only used be inside switch cases & loops."); 
         }
         return null;
     }
@@ -244,6 +244,19 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>
         LoopType enclosingType = currentLoopType;
         currentLoopType = LoopType.LOOP;
         resolve(stmt.body);
+        currentLoopType = enclosingType;
+        return null;
+    }
+
+    @Override
+    public Void visitSwitchStmt(Stmt.Switch stmt)
+    {
+        LoopType enclosingType = currentLoopType;
+        currentLoopType = LoopType.SWITCH;
+        for(Stmt item : stmt.branches)
+        {
+            resolve(item);
+        }
         currentLoopType = enclosingType;
         return null;
     }

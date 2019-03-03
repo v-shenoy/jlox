@@ -2,7 +2,7 @@ package lox;
 
 enum LoopType
 {
-    NONE, LOOP
+    NONE, LOOP, SWITCH
 }
 
 enum JumpType

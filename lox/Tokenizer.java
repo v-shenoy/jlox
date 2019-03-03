@@ -33,7 +33,11 @@ class Tokenizer
         keywords.put("print", TokenType.PRINT);                     
         keywords.put("return", TokenType.RETURN);
         keywords.put("class", TokenType.CLASS);                    
+        keywords.put("super", TokenType.SUPER);                    
         keywords.put("self", TokenType.SELF);                      
+        keywords.put("switch", TokenType.SWITCH);                      
+        keywords.put("case", TokenType.CASE);                      
+        keywords.put("default", TokenType.DEFAULT);                      
     }
     
     Tokenizer(String source)

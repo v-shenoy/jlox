@@ -23,7 +23,7 @@ enum TokenType
     // Reserved words
     IF, ELSE, LET, DEFINE, FOR, WHILE, DO, RETURN, 
     TRUE, FALSE, NIL, BREAK, CONTINUE, PRINT, CLASS,
-    SUPER, SELF, QUESTION, COLON,
+    SUPER, SELF, QUESTION, COLON, SWITCH, CASE, DEFAULT,
 
     // Others
     END

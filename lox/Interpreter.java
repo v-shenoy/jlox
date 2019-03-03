@@ -245,6 +245,35 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>
     }
 
     @Override
+    public Void visitSwitchStmt(Stmt.Switch stmt)
+    {
+        Object cond = evaluate(stmt.cond);
+        int index = stmt.exprs.indexOf(cond);
+        if(index == -1)
+        {
+            index = stmt.exprs.indexOf("default");
+        }
+        if(index != -1)
+        {   
+            try
+            {
+                for(int i=index;i<stmt.branches.size();i++)
+                {
+                    execute(stmt.branches.get(i));
+                } 
+            }
+            catch(Jump jump)
+            {
+                if(jump.type == JumpType.BREAK)
+                {
+                    return null;
+                }
+            } 
+        }
+        return null;
+    }
+
+    @Override
     public Object visitLogicalExpr(Expr.Logical expr)
     {
         Object left = evaluate(expr.left);

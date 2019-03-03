@@ -1,6 +1,7 @@
 package lox;
 
 import java.util.List;
+import java.util.ArrayList;
 
 abstract class Stmt
 {
@@ -20,6 +21,7 @@ abstract class Stmt
         T visitReturnStmt(Return stmt);
         T visitBreakStmt(Break stmt);
         T visitContinueStmt(Continue stmt);
+        T visitSwitchStmt(Switch stmt);
     }
 
     static class Expression extends Stmt
@@ -222,6 +224,25 @@ abstract class Stmt
         <T> T accept(Visitor<T> vis)
         {
             return vis.visitContinueStmt(this);
+        }
+    }
+
+    static class Switch extends Stmt
+    {
+        Expr cond;
+        ArrayList<Stmt> branches;
+        ArrayList<Object> exprs;
+
+        Switch(Expr cond, ArrayList<Object>exprs, ArrayList<Stmt> branches)
+        {
+            this.cond = cond;
+            this.exprs = exprs;
+            this.branches = branches;
+        }
+
+        <T> T accept(Visitor<T> vis)
+        {
+            return vis.visitSwitchStmt(this);
         }
     }
 }
