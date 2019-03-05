@@ -3,7 +3,7 @@ package lox;
 enum TokenType
 {
     // Grouping
-    LPAREN, RPAREN, SEMI_COLON, LBRACE, RBRACE, COMMA, 
+    LPAREN, RPAREN, SEMI_COLON, LBRACE, RBRACE, COMMA, DOT,
     // Arithmetic
     PLUS, MINUS, MUL, DIV, ASSIGN, MOD, EXP,
 

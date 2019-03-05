@@ -17,6 +17,9 @@ abstract class Expr
         T visitLogicalExpr(Logical expr);
         T visitConditionalExpr(Conditional expr);
         T visitCallExpr(Call expr);
+        T visitGetExpr(Get expr);
+        T visitSetExpr(Set expr);
+        T visitSelfExpr(Self expr);
     }
    
     static class Binary extends Expr
@@ -172,6 +175,56 @@ abstract class Expr
         <T> T accept(Visitor<T> vis)
         {
             return vis.visitCallExpr(this);
+        }
+    }
+
+    static class Get extends Expr
+    {
+        Token name;
+        Expr object;
+
+        Get(Token name, Expr object)
+        {
+            this.name = name;
+            this.object = object;
+        }
+
+        <T> T accept(Visitor<T> vis)
+        {
+            return vis.visitGetExpr(this);
+        }
+    }
+
+    static class Set extends Expr
+    {
+        Token name;
+        Expr object, value;
+
+        Set(Token name, Expr object, Expr value)
+        {
+            this.name = name;
+            this.object = object;
+            this.value = value;
+        }
+
+        <T> T accept(Visitor<T> vis)
+        {
+            return vis.visitSetExpr(this);
+        }
+    }
+
+    static class Self extends Expr
+    {
+        Token keyword;
+
+        Self(Token keyword)
+        {
+            this.keyword = keyword;
+        }
+
+        <T> T accept(Visitor<T> vis)
+        {
+            return vis.visitSelfExpr(this);
         }
     }
 }

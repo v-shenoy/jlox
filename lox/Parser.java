@@ -44,6 +44,10 @@ class Parser
             {
                 return funDeclaration("function");
             }
+            if(match(TokenType.CLASS))
+            {
+                return classDeclaration();
+            }
             return statement();
         }
         catch(ParseError error)
@@ -51,6 +55,20 @@ class Parser
             sync();
             return null;
         }
+    }
+
+    private Stmt classDeclaration()
+    {
+        Token name = consume(TokenType.ID, "Expect class name.");
+        consume(TokenType.LBRACE, "Expect '{' before class body.");
+        
+        List<Stmt.Function> methods = new ArrayList<>();    
+        while(!check(TokenType.RBRACE) && !atEnd())
+        {
+            methods.add((Stmt.Function)funDeclaration("method"));
+        }
+        consume(TokenType.RBRACE, "Expect '}' after class body.");
+        return new Stmt.Class(name, methods);
     }
 
     private Stmt funDeclaration(String kind)
@@ -323,6 +341,11 @@ class Parser
                 Token name = ((Expr.Variable)expr).name;
                 return new Expr.Assign(name, value);
             }
+            else if(expr instanceof Expr.Get)
+            {
+                Expr.Get get = (Expr.Get) expr;
+                return new Expr.Set(get.name, get.object, value);
+            }
             error(equals, "Invalid assignment target.");
         }
         return expr;
@@ -493,6 +516,11 @@ class Parser
             {
                 callee = finishCall(callee);
             }
+            else if(match(TokenType.DOT))
+            {
+                Token name = consume(TokenType.ID, "Expect property name after '.'");
+                callee = new Expr.Get(name, callee);
+            }
             else
             {
                 break;
@@ -546,7 +574,11 @@ class Parser
         }
         else if(match(TokenType.ID))
         {
-            return new Expr.Variable(previous());
+            expr = new Expr.Variable(previous());
+        }
+        else if (match(TokenType.SELF))
+        {
+            return new Expr.Self(previous());
         }
         if(expr != null)
         {

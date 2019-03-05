@@ -180,6 +180,9 @@ class Tokenizer
             case '"':
                 handleStrings();
                 break;
+            case '.':
+                addToken(TokenType.DOT);
+                break;
             case ' ':
             case '\t':
             case '\r':

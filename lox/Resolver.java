@@ -11,11 +11,51 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>
     private final Stack< Map<String, Boolean> > scopes = new Stack<>();
     private FunctionType currentFunction = FunctionType.NONE;
     private LoopType currentLoopType = LoopType.NONE;
+    private ClassType currentClass = ClassType.NONE;
 
     Resolver(Interpreter interpreter)
     {
         this.interpreter = interpreter;
     }
+
+    @Override
+    public Void visitClassStmt(Stmt.Class stmt)
+    {
+        ClassType enclosingClass = currentClass;
+        currentClass = ClassType.CLASS;
+        declare(stmt.name);
+        define(stmt.name);
+        beginScope();
+        scopes.peek().put("self", true);  
+        for (Stmt.Function method : stmt.methods) 
+        {       
+            FunctionType declaration;
+            if(method.name.lexeme.equals("init"))
+            {
+                declaration = FunctionType.INITIALIZER; 
+            }
+            else
+            {
+                declaration = FunctionType.METHOD; 
+            }
+            resolveFunction(method, declaration); 
+        }
+        endScope();
+        currentClass = enclosingClass;
+        return null;
+    }
+
+    @Override                                  
+    public Void visitSelfExpr(Expr.Self expr) 
+    {
+        if(currentClass == ClassType.NONE)
+        {
+            Lox.error(expr.keyword, "Cannot use 'self' outside of a class.");
+            return null;
+        }
+        resolveLocal(expr, expr.keyword);        
+        return null;                             
+    }    
 
     @Override
     public Void visitBreakStmt(Stmt.Break stmt)
@@ -199,6 +239,10 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>
         }
         if(stmt.expr != null)
         {
+            if(currentFunction == FunctionType.INITIALIZER)
+            {
+                Lox.error(stmt.keyword, "Cannot return a value from an initializer.");
+            }
             resolve(stmt.expr);
         }
         return null;
@@ -316,10 +360,33 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>
         }
         return null;
     }
+
+    @Override
+    public Void visitGetExpr(Expr.Get expr)
+    {
+        resolve(expr.object);
+        return null;
+    }
+
+    @Override
+    public Void visitSetExpr(Expr.Set expr)
+    {
+        resolve(expr.value);
+        resolve(expr.object);
+        return null;
+    }
 }
 
 enum FunctionType
 {
     NONE,
-    FUNCTION
+    FUNCTION,
+    METHOD,
+    INITIALIZER;
+}
+
+enum ClassType 
+{                        
+    NONE,                                         
+    CLASS                                         
 }

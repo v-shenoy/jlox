@@ -22,6 +22,7 @@ abstract class Stmt
         T visitBreakStmt(Break stmt);
         T visitContinueStmt(Continue stmt);
         T visitSwitchStmt(Switch stmt);
+        T visitClassStmt(Class stmt);
     }
 
     static class Expression extends Stmt
@@ -243,6 +244,23 @@ abstract class Stmt
         <T> T accept(Visitor<T> vis)
         {
             return vis.visitSwitchStmt(this);
+        }
+    }
+
+    static class Class extends Stmt
+    {
+        Token name;
+        List<Stmt.Function> methods;
+
+        Class(Token name, List<Stmt.Function> methods)
+        {
+            this.name = name;
+            this.methods = methods;
+        }
+
+        <T> T accept(Visitor<T> vis)
+        {
+            return vis.visitClassStmt(this);
         }
     }
 }

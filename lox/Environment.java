@@ -66,6 +66,11 @@ class Environment
         return ancestor(distance).get(name);
     }
 
+    Object getAt(int distance, String name)
+    {
+       return ancestor(distance).values.get(name); 
+    }
+
     private Environment ancestor(int distance)
     {
         Environment env = this;
