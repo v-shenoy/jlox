@@ -251,11 +251,13 @@ abstract class Stmt
     {
         Token name;
         List<Stmt.Function> methods;
+        Expr.Variable superclass;
 
-        Class(Token name, List<Stmt.Function> methods)
+        Class(Token name, List<Stmt.Function> methods, Expr.Variable superclass)
         {
             this.name = name;
             this.methods = methods;
+            this.superclass = superclass;
         }
 
         <T> T accept(Visitor<T> vis)

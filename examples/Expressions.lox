@@ -144,5 +144,13 @@ print "Value of true or false: " + (true or false);
 print "Value of false and true: " + (false and true);
 print "Value of nil and true: " + (nil and true);
 
+
+/* Conditional and comma */
+print "----";
+let z := 5;
+print (z:=5)?"z is 5":"z is not 5";
+print 5,2;
+
+
 print "----";
 print "Mess around a bit and try different expressions for yourself ;).";

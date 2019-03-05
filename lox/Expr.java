@@ -20,6 +20,7 @@ abstract class Expr
         T visitGetExpr(Get expr);
         T visitSetExpr(Set expr);
         T visitSelfExpr(Self expr);
+        T visitSuperExpr(Super expr);
     }
    
     static class Binary extends Expr
@@ -225,6 +226,22 @@ abstract class Expr
         <T> T accept(Visitor<T> vis)
         {
             return vis.visitSelfExpr(this);
+        }
+    }
+
+    static class Super extends Expr
+    {
+        Token keyword, method;
+
+        Super(Token keyword, Token method)
+        {
+            this.keyword = keyword;
+            this.method = method;
+        }
+
+        <T> T accept(Visitor<T> vis)
+        {
+            return vis.visitSuperExpr(this);
         }
     }
 }

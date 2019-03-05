@@ -1,0 +1,28 @@
+/* Switch cases work normally.
+    Case labels must be constants. Execution cascades down the case ladder until break is found.
+    Note : Switch cases are buggy inside functions (need to fix issues of scope)
+*/
+
+let c := 2;
+switch(c)
+{
+    case 0:
+    {
+        print "Value is zero.";
+        break;
+    }
+    case 1:
+    {
+        print "Value is one.";
+        break;
+    }
+    case 2:
+    {
+        print "Value is two.";
+    }
+    default:
+    {
+        print "Value is something else.";
+    }
+}   
+    

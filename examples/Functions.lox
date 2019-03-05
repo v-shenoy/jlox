@@ -1,0 +1,44 @@
+/*
+    Functions in lox work the same way as JavaScript (however it currently only supports functions with upto
+    8 parameters. Can be changed easily, but it works as a proof of concept.).
+
+    Function parameters are locally scoped in the function's body. 
+    Functions are first-class, and can be passed around in variables or to other functions, and returned.
+    Lox allows closures.
+
+*/
+
+define fact(n)
+{
+    if(n = 1)
+    {
+        return 1;
+    }
+    return n*fact(n-1);
+}
+
+print fact(7);
+print fact;
+define createCounter()
+{
+    let c := 0;
+    define counter()
+    {
+        c := c + 1;
+        print c;
+    }
+    return counter;
+}
+
+let count := createCounter();
+count();
+count();
+print count; # Notice how it prints <fn counter>
+
+define test(func)
+{
+    func();
+}
+
+test(count);
+

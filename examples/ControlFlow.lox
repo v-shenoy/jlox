@@ -1,8 +1,6 @@
 /*  
     Conditionals, Loop constructs are identical to C.
     Except the for loop, where the variable cannot be declared in the loop initializer.
-
-    Ternary operator hasn't been added yet.
 */
 
 let a := 2;

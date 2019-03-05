@@ -1,0 +1,43 @@
+/* Lox currently doesn't support multiple inheritance.
+    Classes can be locally defined. */
+
+class A
+{
+    show()
+    {
+        print "A";
+    }
+
+    test()
+    {
+        print "Hey there!";
+    }
+}
+
+class B < A
+{
+    init()
+    {
+        print "This is the initializer";
+    }
+
+    showB()
+    {
+        print "B";
+    }
+
+    testB()
+    {
+        print "About to call superclass version of test.";
+        super.test();
+    }
+}
+
+let x := B();
+x.show();
+x.showB();
+
+print B;
+print x;
+
+x.testB();
